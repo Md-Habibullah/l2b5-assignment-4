@@ -1,0 +1,112 @@
+import { useDeleteBookMutation, useGetBooksQuery } from "@/redux/features/book/bookApi"
+import { Button } from "@/components/ui/button"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import type { IBook } from "@/types/bookTypes"
+import Spinner from "@/components/ui/spinner"
+import { Link } from "react-router"
+import { DeletingSpinner } from "@/components/ui/DeletingSpinner"
+import Swal from 'sweetalert2'
+
+export default function Books() {
+    const { data: books, isLoading } = useGetBooksQuery()
+    const [deleteBook, { isLoading: deletingError }] = useDeleteBookMutation()
+    async function handleDelete(id: string) {
+        try {
+            Swal.fire({
+                title: "Are you sure?",
+                text: "You won't be able to revert this!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, Delete Book"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    deleteBook(id)
+                    console.log(`book ${id} is deleted`)
+                    Swal.fire({
+                        title: "Deleted!",
+                        text: "Your file has been deleted.",
+                        icon: "success"
+                    });
+                }
+            });
+
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    if (deletingError) {
+        return <DeletingSpinner />
+    }
+
+    return (
+        <div className="max-w-7xl mx-auto mt-12">
+            <div className="space-y-6">
+                <div className="flex justify-between items-center">
+                    <h2 className="text-2xl font-bold">All Books</h2>
+                    <Link to="/create-book">
+                        <Button className="bg-green-700">Add New Book</Button>
+                    </Link>
+                </div>
+
+                {isLoading ? (
+                    <Spinner />
+                ) : (
+                    <div className="rounded-md border">
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Title</TableHead>
+                                    <TableHead>Author</TableHead>
+                                    <TableHead>Genre</TableHead>
+                                    <TableHead>ISBN</TableHead>
+                                    <TableHead>Copies</TableHead>
+                                    <TableHead>Available</TableHead>
+                                    <TableHead className="text-center">Actions</TableHead>
+                                </TableRow>
+                            </TableHeader>
+
+                            <TableBody>
+                                {books?.map((book: IBook) => (
+                                    <TableRow key={book._id}>
+                                        <TableCell>{book.title}</TableCell>
+                                        <TableCell>{book.author}</TableCell>
+                                        <TableCell>{book.genre}</TableCell>
+                                        <TableCell>{book.isbn}</TableCell>
+                                        <TableCell>{book.copies}</TableCell>
+                                        <TableCell>
+                                            {book.available ? (
+                                                <span className="text-green-500 font-medium">Yes</span>
+                                            ) : (
+                                                <span className="text-red-500 font-medium">No</span>
+                                            )}
+                                        </TableCell>
+                                        <TableCell>
+                                            <div className="flex justify-center gap-2">
+                                                <Link to={`/edit-book/${book._id}`}>
+                                                    <Button className="bg-gray-500" size="sm">
+                                                        Edit
+                                                    </Button>
+                                                </Link>
+                                                <Link to={`/borrow/${book._id}`}>
+                                                    <Button className="bg-green-700" size="sm">
+                                                        Borrow
+                                                    </Button>
+                                                </Link>
+                                                <Button className="bg-red-500" size="sm" onClick={() => handleDelete(book._id)}>
+                                                    Delete
+                                                </Button>
+                                            </div>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </div>
+                )}
+            </div>
+        </div>
+    )
+}
