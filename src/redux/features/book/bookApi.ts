@@ -6,13 +6,15 @@ export const bookApi = createApi({
     baseQuery: fetchBaseQuery({ baseUrl: 'https://assignment-3-sigma-three.vercel.app/api' }),
     tagTypes: ['Books'],
     endpoints: (builder) => ({
-        getBooks: builder.query<IBook[], void>({
-            query: () => '/books',
+        getBooks: builder.query<IBook[], { limit?: number }>({
+            query: ({ limit = '' }) => `/books?limit=${limit}`,
             transformResponse: (response: { success: boolean; message: string; data: IBook[] }) => response.data,
             providesTags: ['Books'],
         }),
+
         getBookById: builder.query<IBook, string>({
             query: (id) => `/books/${id}`,
+            transformResponse: (response: { success: boolean; message: string; data: IBook }) => response.data,
             providesTags: ['Books'],
         }),
         addBook: builder.mutation<IBook, Partial<IBook>>({

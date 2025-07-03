@@ -1,7 +1,11 @@
 
 import MainLayout from "@/layout/MainLayout";
 import Books from "@/pages/Books/Books";
+import BorrowSummary from "@/pages/borrow-summary/BorrowSummary";
+import Borrow from "@/pages/borrow/Borrow";
 import CreateBook from "@/pages/createBook/CreateBook";
+import EditBookPage from "@/pages/edit-book/EditBookPage";
+import BookDetails from "@/pages/home/bookGrid/BookDetail";
 import Home from "@/pages/home/home/Home";
 import { createBrowserRouter } from "react-router";
 
@@ -24,19 +28,19 @@ export const router = createBrowserRouter([
             },
             {
                 path: 'books/:id',
-                // Component:
+                Component: BookDetails
             },
             {
                 path: 'edit-book/:id',
-                // Component:
+                Component: EditBookPage
             },
             {
                 path: 'borrow/:bookId',
-                // Component:
+                Component: Borrow
             },
             {
                 path: 'borrow-summary',
-                // Component:
+                Component: BorrowSummary
             }
         ]
     },

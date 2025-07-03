@@ -1,150 +1,182 @@
-import { useForm } from "react-hook-form"
-import { useState } from "react"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { toast } from "sonner"
-import { BookOpen, Pencil, Trash2, Book } from "lucide-react"
+import React, { useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { useGetBookByIdQuery, useUpdateBookMutation } from '@/redux/features/book/bookApi';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 
-type Book = {
-    id: string
-    title: string
-    author: string
-    genre: string
-    isbn: string
-    description: string
-    copies: number
-    available: boolean
-}
+const EditBookPage = () => {
+    const { id } = useParams<{ id: string }>();
+    const navigate = useNavigate();
 
-type Props = {
-    book: Book
-    onUpdate: (updatedBook: Book) => void
-    onDelete: (bookId: string) => void
-    onBorrow: (bookId: string) => void
-}
+    const { data: book, isLoading, isError } = useGetBookByIdQuery(id ?? '');
+    const [updateBook, { isLoading: updating }] = useUpdateBookMutation();
 
-function EditBook({ book, onUpdate, onDelete, onBorrow }: Props) {
-    const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<Book>({
-        defaultValues: book,
-    })
+    const [formState, setFormState] = React.useState({
+        title: '',
+        author: '',
+        genre: '',
+        isbn: '',
+        description: '',
+        copies: 0,
+        available: true,
+    });
 
-    const [isDeleteOpen, setIsDeleteOpen] = useState(false)
-
-    const onSubmit = (data: Book) => {
-        const updatedBook = {
-            ...data,
-            available: data.copies > 0,
+    // Load default values from book
+    useEffect(() => {
+        if (book) {
+            setFormState({
+                title: book.title,
+                author: book.author,
+                genre: book.genre,
+                isbn: book.isbn,
+                description: book.description,
+                copies: book.copies,
+                available: book.available,
+            });
         }
+    }, [book]);
 
-        // Simulate API update
-        onUpdate(updatedBook)
-        toast.success("Book updated successfully!")
-    }
+    const genreOptions = [
+        'FICTION',
+        'NON_FICTION',
+        'SCIENCE',
+        'HISTORY',
+        'BIOGRAPHY',
+        'FANTASY',
+    ];
 
-    const handleDelete = () => {
-        onDelete(book.id)
-        toast.success("Book deleted.")
-        setIsDeleteOpen(false)
-    }
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        const { name, value } = e.target;
 
-    const handleBorrow = () => {
-        onBorrow(book.id)
-        toast.success("Book borrowed!")
-    }
+        // If editing "copies", auto-set available
+        if (name === 'copies') {
+            const num = Number(value);
+            setFormState((prev) => ({
+                ...prev,
+                copies: num,
+                available: num > 0,
+            }));
+        } else {
+            setFormState((prev) => ({ ...prev, [name]: value }));
+        }
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        try {
+            await updateBook({ id: id!, data: formState }).unwrap();
+            // toast.success('Book updated successfully!');
+            navigate(`/books/${id}`);
+        } catch (error) {
+            // toast.error('Update failed.');
+            console.log(error)
+        }
+        console.log({ id: id!, data: formState })
+    };
+
+    if (isLoading) return <p className="text-center mt-10">Loading book...</p>;
+    if (isError || !book) return <p className="text-red-500 text-center mt-10">Book not found.</p>;
 
     return (
-        <div className="max-w-2xl mx-auto p-6 space-y-6">
-            <h1 className="text-2xl font-bold flex items-center gap-2">
-                <Pencil className="w-5 h-5" /> Edit Book
-            </h1>
+        <div className="max-w-2xl mx-auto px-4 mt-10">
+            <Card>
+                <CardHeader>
+                    <CardTitle className="text-xl">Edit Book: {book.title}</CardTitle>
+                </CardHeader>
 
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                <div>
-                    <Label htmlFor="title">Title</Label>
-                    <Input id="title" {...register("title", { required: "Title is required" })} />
-                    {errors.title && <p className="text-sm text-red-500">{errors.title.message}</p>}
-                </div>
+                <form onSubmit={handleSubmit}>
+                    <CardContent className="space-y-4">
+                        <div>
+                            <Label htmlFor="title">Title</Label>
+                            <Input name="title" value={formState.title} onChange={handleChange} required />
+                        </div>
 
-                <div>
-                    <Label htmlFor="author">Author</Label>
-                    <Input id="author" {...register("author", { required: "Author is required" })} />
-                </div>
+                        <div>
+                            <Label htmlFor="author">Author</Label>
+                            <Input name="author" value={formState.author} onChange={handleChange} required />
+                        </div>
 
-                <div>
-                    <Label htmlFor="genre">Genre</Label>
-                    <Input id="genre" {...register("genre", { required: "Genre is required" })} />
-                </div>
+                        <div>
+                            <Label htmlFor="genre">Genre</Label>
+                            <Select
+                                value={formState.genre}
+                                onValueChange={(value) =>
+                                    setFormState((prev) => ({ ...prev, genre: value }))
+                                }
+                            >
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select genre" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {genreOptions.map((genre) => (
+                                        <SelectItem key={genre} value={genre}>
+                                            {genre.replace('_', ' ')}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div>
+                            <Label htmlFor="isbn">ISBN</Label>
+                            <Input name="isbn" value={formState.isbn} onChange={handleChange} required />
+                        </div>
 
-                <div>
-                    <Label htmlFor="isbn">ISBN</Label>
-                    <Input id="isbn" {...register("isbn", { required: "ISBN is required" })} />
-                </div>
+                        <div>
+                            <Label htmlFor="description">Description</Label>
+                            <textarea
+                                name="description"
+                                className="w-full border rounded px-3 py-2 text-sm"
+                                value={formState.description}
+                                onChange={handleChange}
+                                rows={4}
+                            />
+                        </div>
 
-                <div>
-                    <Label htmlFor="description">Description</Label>
-                    <Textarea id="description" {...register("description", { required: true })} rows={4} />
-                </div>
+                        <div>
+                            <Label htmlFor="copies">Copies</Label>
+                            <Input
+                                type="number"
+                                name="copies"
+                                value={formState.copies}
+                                onChange={handleChange}
+                                required
+                                min={0}
+                            />
+                        </div>
 
-                <div>
-                    <Label htmlFor="copies">Copies</Label>
-                    <Input
-                        id="copies"
-                        type="number"
-                        {...register("copies", {
-                            required: "Number of copies is required",
-                            valueAsNumber: true,
-                            min: { value: 0, message: "Must be 0 or more" },
-                            onChange: (e) => {
-                                const val = parseInt(e.target.value)
-                                if (val === 0) setValue("available", false)
-                            },
-                        })}
-                    />
-                    {errors.copies && <p className="text-sm text-red-500">{errors.copies.message}</p>}
-                </div>
+                        <div>
+                            <Label>Available</Label>
+                            <p className="text-sm mt-1">
+                                {formState.available ? (
+                                    <span className="text-green-600">Yes</span>
+                                ) : (
+                                    <span className="text-red-600">No</span>
+                                )}
+                            </p>
+                        </div>
+                    </CardContent>
 
-                <div className="flex items-center space-x-2">
-                    <Checkbox
-                        id="available"
-                        checked={watch("available")}
-                        onCheckedChange={(checked) => {
-                            const val = typeof checked === "boolean" ? checked : false
-                            setValue("available", val)
-                        }}
-                    />
-                    <Label htmlFor="available">Available</Label>
-                </div>
-
-                <div className="flex gap-4 pt-4">
-                    <Button type="submit">Save Changes</Button>
-                    <Button variant="outline" type="button" onClick={handleBorrow}>
-                        <Book className="w-4 h-4 mr-2" /> Borrow Book
-                    </Button>
-                    <Dialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
-                        <DialogTrigger asChild>
-                            <Button variant="destructive" type="button">
-                                <Trash2 className="w-4 h-4 mr-2" /> Delete
-                            </Button>
-                        </DialogTrigger>
-                        <DialogContent>
-                            <DialogHeader>
-                                <DialogTitle>Confirm Delete</DialogTitle>
-                            </DialogHeader>
-                            <p>Are you sure you want to delete <strong>{book.title}</strong>?</p>
-                            <DialogFooter className="mt-4">
-                                <Button variant="outline" onClick={() => setIsDeleteOpen(false)}>Cancel</Button>
-                                <Button variant="destructive" onClick={handleDelete}>Yes, Delete</Button>
-                            </DialogFooter>
-                        </DialogContent>
-                    </Dialog>
-                </div>
-            </form>
+                    <CardFooter className="flex justify-between mt-4">
+                        <Button type="submit" disabled={updating}>
+                            {updating ? 'Saving...' : 'Update Book'}
+                        </Button>
+                        <Button type="button" variant="outline" onClick={() => navigate(`/books/${id}`)}>
+                            Cancel
+                        </Button>
+                    </CardFooter>
+                </form>
+            </Card>
         </div>
-    )
-}
+    );
+};
 
-export default EditBook;
+export default EditBookPage;

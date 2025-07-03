@@ -6,10 +6,14 @@ import Spinner from "@/components/ui/spinner"
 import { Link } from "react-router"
 import { DeletingSpinner } from "@/components/ui/DeletingSpinner"
 import Swal from 'sweetalert2'
+import { BookOpen, Pencil, Trash2 } from "lucide-react"
 
 export default function Books() {
-    const { data: books, isLoading } = useGetBooksQuery()
+    const { data: books, isLoading } = useGetBooksQuery({ limit: 1000 })
     const [deleteBook, { isLoading: deletingError }] = useDeleteBookMutation()
+
+    // const [borrowBook, { isLoading: borrowLoading }] = useBorrowBookMutation()
+
     async function handleDelete(id: string) {
         try {
             Swal.fire({
@@ -42,7 +46,7 @@ export default function Books() {
     }
 
     return (
-        <div className="max-w-7xl mx-auto mt-12">
+        <div className="max-w-7xl mx-auto m-12">
             <div className="space-y-6">
                 <div className="flex justify-between items-center">
                     <h2 className="text-2xl font-bold">All Books</h2>
@@ -85,18 +89,21 @@ export default function Books() {
                                         </TableCell>
                                         <TableCell>
                                             <div className="flex justify-center gap-2">
-                                                <Link to={`/edit-book/${book._id}`}>
-                                                    <Button className="bg-gray-500" size="sm">
-                                                        Edit
-                                                    </Button>
-                                                </Link>
+
                                                 <Link to={`/borrow/${book._id}`}>
                                                     <Button className="bg-green-700" size="sm">
-                                                        Borrow
+                                                        <BookOpen className="w-4 h-4 mr-1" />Borrow
+                                                    </Button>
+                                                </Link>
+
+
+                                                <Link to={`/edit-book/${book._id}`}>
+                                                    <Button className="bg-gray-500" size="sm">
+                                                        <Pencil className="w-4 h-4 mr-1" />
                                                     </Button>
                                                 </Link>
                                                 <Button className="bg-red-500" size="sm" onClick={() => handleDelete(book._id)}>
-                                                    Delete
+                                                    <Trash2 className="w-4 h-4 mr-1" />
                                                 </Button>
                                             </div>
                                         </TableCell>
