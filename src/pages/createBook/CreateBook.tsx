@@ -4,19 +4,13 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Button } from "@/components/ui/button"
-import {
-    Select,
-    SelectTrigger,
-    SelectValue,
-    SelectContent,
-    SelectItem,
-} from "@/components/ui/select"
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
 import { useAddBookMutation } from "@/redux/features/book/bookApi"
 import { useNavigate } from "react-router"
 import Spinner from "@/components/ui/spinner"
 import Swal from "sweetalert2"
 
-function BookForm() {
+const BookForm = () => {
     const [addBook, { isLoading }] = useAddBookMutation()
     const navigate = useNavigate()
     const [available, setAvailable] = useState(true)
@@ -53,6 +47,12 @@ function BookForm() {
             });
         } catch (error) {
             console.log(error)
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Failed to add the book",
+                footer: '<a href="#">Why do I have this issue?</a>'
+            });
         }
     }
 

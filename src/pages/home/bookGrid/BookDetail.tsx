@@ -1,13 +1,6 @@
 
 import { useParams, useNavigate } from 'react-router';
-import {
-    Card,
-    CardHeader,
-    CardTitle,
-    CardDescription,
-    CardContent,
-    CardFooter,
-} from '@/components/ui/card';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Pencil, Trash2 } from 'lucide-react';
@@ -73,7 +66,7 @@ const BookDetails = () => {
                 </CardContent>
 
                 <CardFooter className="flex justify-end pt-6 gap-2 flex-wrap">
-                    <Button variant="outline" size="sm" onClick={() => navigate(`/books/${book._id}?edit=true`)}>
+                    <Button variant="outline" size="sm" onClick={() => navigate(`/edit-book/${book._id}?edit=true`)}>
                         <Pencil className="w-4 h-4 mr-1" />
                         Edit
                     </Button>

@@ -5,18 +5,12 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useGetBookByIdQuery, useUpdateBookMutation } from '@/redux/features/book/bookApi';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
+import FullPageSpinner from '@/components/ui/spinner';
+import Swal from 'sweetalert2';
 
 const EditBookPage = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
-
     const { data: book, isLoading, isError } = useGetBookByIdQuery(id ?? '');
     const [updateBook, { isLoading: updating }] = useUpdateBookMutation();
 
@@ -30,13 +24,13 @@ const EditBookPage = () => {
         available: true,
     });
 
-    // Load default values from book
+    // Load previous values
     useEffect(() => {
         if (book) {
             setFormState({
                 title: book.title,
                 author: book.author,
-                genre: book.genre,
+                genre: book?.genre,
                 isbn: book.isbn,
                 description: book.description,
                 copies: book.copies,
@@ -45,19 +39,10 @@ const EditBookPage = () => {
         }
     }, [book]);
 
-    const genreOptions = [
-        'FICTION',
-        'NON_FICTION',
-        'SCIENCE',
-        'HISTORY',
-        'BIOGRAPHY',
-        'FANTASY',
-    ];
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
 
-        // If editing "copies", auto-set available
+        // business logic for set availablity
         if (name === 'copies') {
             const num = Number(value);
             setFormState((prev) => ({
@@ -70,24 +55,38 @@ const EditBookPage = () => {
         }
     };
 
+
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
             await updateBook({ id: id!, data: formState }).unwrap();
-            // toast.success('Book updated successfully!');
+
             navigate(`/books/${id}`);
+            Swal.fire({
+                position: "center",
+                icon: "success",
+                title: "Book updated successfully",
+                showConfirmButton: false,
+                timer: 1500
+            });
         } catch (error) {
-            // toast.error('Update failed.');
             console.log(error)
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Failed to edit the book",
+                footer: '<a href="#">Why do I have this issue?</a>'
+            });
         }
         console.log({ id: id!, data: formState })
     };
 
-    if (isLoading) return <p className="text-center mt-10">Loading book...</p>;
+    if (isLoading) return <FullPageSpinner />;
     if (isError || !book) return <p className="text-red-500 text-center mt-10">Book not found.</p>;
 
     return (
-        <div className="max-w-2xl mx-auto px-4 mt-10">
+        <div className="max-w-2xl mx-auto px-4 my-12">
             <Card>
                 <CardHeader>
                     <CardTitle className="text-xl">Edit Book: {book.title}</CardTitle>
@@ -106,25 +105,25 @@ const EditBookPage = () => {
                         </div>
 
                         <div>
-                            <Label htmlFor="genre">Genre</Label>
-                            <Select
+                            <Label htmlFor="genre" className="mb-2 block">Genre</Label>
+                            <select
+                                id="genre"
+                                name="genre"
                                 value={formState.genre}
-                                onValueChange={(value) =>
-                                    setFormState((prev) => ({ ...prev, genre: value }))
-                                }
+                                onChange={handleChange}
+                                className="w-full border rounded px-3 py-2 text-sm"
+                                required
                             >
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select genre" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {genreOptions.map((genre) => (
-                                        <SelectItem key={genre} value={genre}>
-                                            {genre.replace('_', ' ')}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
+                                <option value="" disabled>Select genre</option>
+                                <option value="FICTION">FICTION</option>
+                                <option value="NON_FICTION">NON FICTION</option>
+                                <option value="SCIENCE">SCIENCE</option>
+                                <option value="HISTORY">HISTORY</option>
+                                <option value="BIOGRAPHY">BIOGRAPHY</option>
+                                <option value="FANTASY">FANTASY</option>
+                            </select>
                         </div>
+
                         <div>
                             <Label htmlFor="isbn">ISBN</Label>
                             <Input name="isbn" value={formState.isbn} onChange={handleChange} required />

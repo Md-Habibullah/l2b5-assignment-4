@@ -8,14 +8,14 @@ export const bookApi = createApi({
     endpoints: (builder) => ({
         getBooks: builder.query<IBook[], { limit?: number }>({
             query: ({ limit = '' }) => `/books?limit=${limit}`,
-            transformResponse: (response: { success: boolean; message: string; data: IBook[] }) => response.data,
-            providesTags: ['Books'],
+            transformResponse: (response: { data: IBook[] }) => response.data,
+            providesTags: ['Books']
         }),
 
         getBookById: builder.query<IBook, string>({
             query: (id) => `/books/${id}`,
-            transformResponse: (response: { success: boolean; message: string; data: IBook }) => response.data,
-            providesTags: ['Books'],
+            transformResponse: (response: { data: IBook }) => response.data,
+            providesTags: ['Books']
         }),
         addBook: builder.mutation<IBook, Partial<IBook>>({
             query: (book) => ({
@@ -23,22 +23,22 @@ export const bookApi = createApi({
                 method: 'POST',
                 body: book,
             }),
-            invalidatesTags: ['Books'],
+            invalidatesTags: ['Books']
         }),
         updateBook: builder.mutation<IBook, { id: string; data: Partial<IBook> }>({
             query: ({ id, data }) => ({
                 url: `/books/${id}`,
-                method: 'PATCH',
+                method: 'PUT',
                 body: data,
             }),
-            invalidatesTags: ['Books'],
+            invalidatesTags: ['Books']
         }),
         deleteBook: builder.mutation<{ message: string }, string>({
             query: (id) => ({
                 url: `/books/${id}`,
                 method: 'DELETE',
             }),
-            invalidatesTags: ['Books'],
+            invalidatesTags: ['Books']
         }),
     }),
 });

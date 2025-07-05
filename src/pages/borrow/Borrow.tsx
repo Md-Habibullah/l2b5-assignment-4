@@ -1,12 +1,6 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router';
-import {
-    Card,
-    CardHeader,
-    CardTitle,
-    CardContent,
-    CardFooter,
-} from '@/components/ui/card';
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -28,7 +22,10 @@ const Borrow = () => {
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        setForm((prev) => ({ ...prev, [name]: value }));
+        setForm((prev) => ({
+            ...prev,
+            [name]: value
+        }));
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -50,7 +47,7 @@ const Borrow = () => {
                 book: bookId!,
                 quantity,
                 dueDate: form.dueDate,
-            }).unwrap();
+            });
 
             Swal.fire({
                 position: 'center',
@@ -59,7 +56,6 @@ const Borrow = () => {
                 showConfirmButton: false,
                 timer: 1500,
             });
-
             navigate('/borrow-summary');
         } catch (err) {
             console.error(err);
@@ -71,8 +67,12 @@ const Borrow = () => {
         }
     };
 
-    if (isLoading) return <p className="text-center mt-10">Loading book...</p>;
-    if (isError || !book) return <p className="text-red-600 text-center mt-10">Book not found.</p>;
+    if (isLoading) {
+        return <p className="text-center mt-10">Loading book...</p>;
+    }
+    if (isError || !book) {
+        return <p className="text-red-600 text-center mt-10">Book not found.</p>;
+    }
 
     return (
         <div className="max-w-xl mx-auto mt-10 px-4">

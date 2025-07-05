@@ -1,13 +1,6 @@
 
 import { useGetBorrowSummaryQuery } from '@/redux/features/borrow/borrowApi';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Loader2 } from 'lucide-react';
 
@@ -27,7 +20,7 @@ const BorrowSummaryTable = () => {
     }
 
     return (
-        <div className="max-w-4xl mx-auto mt-10 px-4">
+        <div className="max-w-4xl mx-auto my-12 px-4">
             <Card>
                 <CardHeader>
                     <CardTitle className="text-xl text-center">Borrow Summary</CardTitle>
