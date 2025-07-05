@@ -1,70 +1,125 @@
-# React + TypeScript + Vite
+# 📚 Minimal Library Management System
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A full-stack Library Management System built for assignment submission. It allows users to view, create, update, borrow, and delete books. Built with **React, TypeScript, Redux Toolkit Query, ShadCN UI**, and **Express + MongoDB** backend.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## ✨ Features
 
-## Expanding the ESLint configuration
+- 📖 View all books in grid or table view
+- 🔍 Book details with availability status
+- ✏️ Edit book information
+- ➕ Add new books
+- 🗑️ Delete books with confirmation
+- 📦 Borrow books (quantity + due date)
+- 📊 View borrow summary with quantity breakdown
+- ✅ Pagination, sorting, filtering
+- ⚡ Fully type-safe using TypeScript
+- 💅 Responsive and clean UI using ShadCN & TailwindCSS
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+---
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## 💠 Tech Stack
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+### Frontend
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- React (with Vite)
+- TypeScript
+- Redux Toolkit + RTK Query
+- ShadCN UI (Tailwind-based)
+- React Router DOM
+- SweetAlert2 (modal/alerts)
+
+### Backend
+
+- Node.js + Express
+- MongoDB with Mongoose
+- RESTful API endpoints
+
+---
+
+## 🧹 Folder Structure (Frontend)
+
+```
+src/
+├── components/          # Reusable UI components
+├── pages/               # Page components (Books, Borrow, Edit, etc.)
+├── redux/               # Redux Toolkit slices & API layers
+│   └── features/
+│       ├── book/
+│       └── borrow/
+├── types/               # TypeScript interfaces
+├── App.tsx              # Main routing config
+└── main.tsx             # Root app entry
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+---
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 🚀 Getting Started
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/your-username/library-management-system.git
+cd library-management-system
 ```
-# l2b5-assignment-4
+
+### 2. Install dependencies (Frontend)
+
+```bash
+cd frontend
+npm install
+```
+
+### 3. Start the frontend
+
+```bash
+npm run dev
+```
+
+### 4. Install dependencies (Backend)
+
+```bash
+cd backend
+npm install
+```
+
+### 5. Setup environment variables (`.env`)
+
+```env
+PORT=5000
+MONGO_URI=your_mongodb_connection_uri
+```
+
+### 6. Start the backend
+
+```bash
+npm run dev
+```
+
+---
+
+## 📷 Screenshots
+
+> ✅ Book Grid UI\
+> ✅ Borrow Form\
+> ✅ Borrow Summary\
+> ✅ Responsive Table View
+
+*(Add screenshots in assignment submission or GitHub preview)*
+
+---
+
+## 📬 Contact / Submission Info
+
+- 👨‍🏫 **Name**: Md. Habibullah
+- 📝 **Assignment**: Library Management System (CRUD + Borrow)
+- 🏫 **Institute**: [Your Institute Name]
+- 🧑‍🏫 **Instructor**: [Instructor Name]
+
+---
+
+## 📄 License
+
+This project is submitted as part of a course/assignment. Reuse only with permission.
+
