@@ -7,6 +7,7 @@ import CreateBook from "@/pages/createBook/CreateBook";
 import EditBookPage from "@/pages/edit-book/EditBookPage";
 import BookDetails from "@/pages/home/bookGrid/BookDetail";
 import Home from "@/pages/home/home/Home";
+import NotFound from "@/pages/no-route/NotFound";
 import { createBrowserRouter } from "react-router";
 
 export const router = createBrowserRouter([
@@ -42,6 +43,7 @@ export const router = createBrowserRouter([
                 path: 'borrow-summary',
                 Component: BorrowSummary
             }
-        ]
+        ],
+        errorElement: <NotFound />
     },
 ]);
